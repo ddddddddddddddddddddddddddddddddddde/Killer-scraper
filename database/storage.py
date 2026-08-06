@@ -16,6 +16,7 @@ def save_articles(article_list):
         article_data.setdefault("source_type", "unknown")
         article_data.setdefault("date", "")
         article_data.setdefault("summary", "")
+        article_data.setdefault("ai_summary", "")
         article_data.setdefault("score", 0)
         article_data.setdefault("priority", 0)
         article_data.setdefault("source_type", "unknown")

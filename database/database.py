@@ -24,6 +24,7 @@ def initialize_schema() -> None:
             ("source_type", "TEXT"),
             ("date", "TEXT"),
             ("summary", "TEXT"),
+            ("ai_summary", "TEXT"),
             ("score", "INTEGER"),
             ("priority", "INTEGER"),
             ("status", "TEXT DEFAULT 'new'"),

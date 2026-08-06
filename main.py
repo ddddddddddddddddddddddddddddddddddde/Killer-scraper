@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 
+from ai.analyzer import analyze
 from config import KEYWORDS, SCAN_INTERVAL_SECONDS
 from database.database import engine, initialize_schema
 from database.models import Base
@@ -81,6 +82,8 @@ def run_scan() -> None:
         article["priority"] = calculate_priority(article)
 
         if article["priority"] >= 2:
+            article_text = f"{article.get('title', '')}\n\n{article.get('summary', '')}"
+            article["ai_summary"] = analyze(article_text).get("summary", "")
             filtered.append(article)
 
     added = save_articles(filtered)

@@ -29,6 +29,8 @@ class Article(Base):
 
     summary = Column(Text)
 
+    ai_summary = Column(Text)
+
     score = Column(Integer, default=0)
 
     priority = Column(Integer, default=0)

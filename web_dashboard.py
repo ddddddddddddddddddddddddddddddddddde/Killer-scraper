@@ -110,6 +110,8 @@ HTML_TEMPLATE = """
           </div>
           <div><span class="label">Summary</span></div>
           <p class="detail-summary">{{ article.summary or 'No summary available.' }}</p>
+          <div><span class="label">Transcript Summary</span></div>
+          <p class="detail-summary">{{ article.ai_summary or 'No transcript summary available.' }}</p>
           <p><a href=\"{{ article.link }}\" target=\"_blank\" rel=\"noreferrer\" onclick=\"event.stopPropagation()\">Open original source &#8594;</a></p>
         </td>
       </tr>
@@ -147,7 +149,7 @@ def create_app(database_path: Optional[str] = None) -> Flask:
         try:
             articles = session.execute(
                 text(
-                    "SELECT title, link, source, source_type, score, priority, date, status, summary FROM articles ORDER BY id DESC LIMIT 50"
+                    "SELECT title, link, source, source_type, score, priority, date, status, summary, ai_summary FROM articles ORDER BY id DESC LIMIT 50"
                 )
             ).fetchall()
             article_rows = [
@@ -161,6 +163,7 @@ def create_app(database_path: Optional[str] = None) -> Flask:
                     "collected_at": row[6],
                     "status": row[7],
                     "summary": row[8],
+                    "ai_summary": row[9],
                 }
                 for row in articles
             ]
