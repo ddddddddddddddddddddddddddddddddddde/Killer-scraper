@@ -1,0 +1,11 @@
+feedparser
+sqlalchemy
+python-dotenv
+requests
+beautifulsoup4
+flask
+apscheduler
+pandas
+gunicorn
+openai
+pytest
