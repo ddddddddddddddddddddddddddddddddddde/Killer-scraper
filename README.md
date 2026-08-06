@@ -24,3 +24,4 @@ gunicorn web_dashboard:app
 
 - PORT: optional, defaults to 5000
 - SENTINEL_DB_PATH: optional, defaults to the local SQLite database in data/sentinel.db
+# Killer-scraper
