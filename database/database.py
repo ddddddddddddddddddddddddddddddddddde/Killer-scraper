@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 DB_PATH = Path(__file__).resolve().parent.parent / "data" / "sentinel.db"
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 engine = create_engine(f"sqlite:///{DB_PATH}")
 
 Session = sessionmaker(bind=engine)
