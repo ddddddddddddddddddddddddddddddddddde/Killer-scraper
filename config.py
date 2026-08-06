@@ -8,7 +8,7 @@ APP_NAME = "Sentinel OSINT Monitor"
 DATABASE = "data/sentinel.db"
 
 # How often main.py's scheduler re-runs the full scan.
-SCAN_INTERVAL_SECONDS = int(os.getenv("SCAN_INTERVAL_SECONDS", "60"))
+SCAN_INTERVAL_SECONDS = int(os.getenv("SCAN_INTERVAL_SECONDS", "20"))
 
 RSS_FEEDS = [
     "https://news.google.com/rss/search?q=homicide",

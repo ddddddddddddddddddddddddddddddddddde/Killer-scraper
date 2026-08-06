@@ -8,6 +8,7 @@ from flask import Flask, render_template_string, request
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
+from config import SCAN_INTERVAL_SECONDS
 from database.models import Base
 
 
@@ -193,7 +194,7 @@ HTML_TEMPLATE = """
           <p>Real-time OSINT monitoring across news, community and scanner feeds.</p>
         </div>
       </div>
-      <div class="live-badge"><span class="live-dot"></span> LIVE MONITORING</div>
+      <div class="live-badge"><span class="live-dot"></span> LIVE MONITORING &middot; refreshing in <span id="countdown">{{ refresh_seconds }}</span>s</div>
     </div>
 
     <div class="stats">
@@ -291,6 +292,19 @@ HTML_TEMPLATE = """
       }
     });
   }
+
+  (function autoRefresh() {
+    var seconds = {{ refresh_seconds }};
+    var countdownEl = document.getElementById('countdown');
+    setInterval(function () {
+      seconds -= 1;
+      if (seconds <= 0) {
+        window.location.reload();
+        return;
+      }
+      if (countdownEl) { countdownEl.textContent = seconds; }
+    }, 1000);
+  })();
 </script>
 </html>
 """
@@ -342,6 +356,7 @@ def create_app(database_path: Optional[str] = None) -> Flask:
             HTML_TEMPLATE,
             articles=article_rows,
             stats=stats,
+            refresh_seconds=SCAN_INTERVAL_SECONDS,
         )
 
     return app
