@@ -52,7 +52,8 @@ HTML_TEMPLATE = """
     table { width: 100%; border-collapse: collapse; }
     th, td { border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0.7rem 0.55rem; text-align: left; vertical-align: top; }
     th { color: #8ca3be; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; }
-    tbody tr:hover { background: rgba(255,255,255,0.035); }
+    tbody tr.row { cursor: pointer; }
+    tbody tr.row:hover { background: rgba(255,255,255,0.035); }
     a { color: #74b9ff; text-decoration: none; }
     a:hover { text-decoration: underline; }
     .pill {
@@ -64,6 +65,14 @@ HTML_TEMPLATE = """
       color: #f7fbff;
     }
     .muted { color: #92a2b8; }
+    .caret { display: inline-block; margin-right: 0.5rem; color: #74b9ff; transition: transform 0.15s ease; }
+    tr.row.open .caret { transform: rotate(90deg); }
+    tr.details { display: none; background: rgba(255,255,255,0.03); }
+    tr.details.open { display: table-row; }
+    tr.details td { padding: 0.9rem 1.1rem 1.1rem 2rem; }
+    .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.6rem 1.5rem; margin-bottom: 0.7rem; }
+    .detail-grid div span.label { display: block; color: #8ca3be; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.15rem; }
+    .detail-summary { color: #dbe4f2; line-height: 1.5; white-space: pre-wrap; }
   </style>
 </head>
 <body>
@@ -76,11 +85,12 @@ HTML_TEMPLATE = """
   <div class=\"card\">
     <h2>Articles</h2>
     <table>
-      <thead><tr><th>Title</th><th>Source</th><th>Type</th><th>Score</th><th>Priority</th><th>Collected</th><th>Status</th></tr></thead>
+      <thead><tr><th></th><th>Title</th><th>Source</th><th>Type</th><th>Score</th><th>Priority</th><th>Collected</th><th>Status</th></tr></thead>
       <tbody>
       {% for article in articles %}
-      <tr>
-        <td><a href=\"{{ article.link }}\" target=\"_blank\" rel=\"noreferrer\">{{ article.title }}</a></td>
+      <tr class="row" onclick="toggleDetails({{ loop.index }})">
+        <td><span class="caret">&#9656;</span></td>
+        <td>{{ article.title }}</td>
         <td>{{ article.source or 'n/a' }}</td>
         <td>{{ article.source_type or 'n/a' }}</td>
         <td>{{ article.score }}</td>
@@ -88,14 +98,37 @@ HTML_TEMPLATE = """
         <td>{{ article.collected_at or 'n/a' }}</td>
         <td><span class=\"pill\">{{ article.status }}</span></td>
       </tr>
+      <tr class="details" id="details-{{ loop.index }}">
+        <td colspan="8">
+          <div class="detail-grid">
+            <div><span class="label">Source</span>{{ article.source or 'n/a' }}</div>
+            <div><span class="label">Type</span>{{ article.source_type or 'n/a' }}</div>
+            <div><span class="label">Score</span>{{ article.score }}</div>
+            <div><span class="label">Priority</span>{{ article.priority }}</div>
+            <div><span class="label">Collected</span>{{ article.collected_at or 'n/a' }}</div>
+            <div><span class="label">Status</span>{{ article.status }}</div>
+          </div>
+          <div><span class="label">Summary</span></div>
+          <p class="detail-summary">{{ article.summary or 'No summary available.' }}</p>
+          <p><a href=\"{{ article.link }}\" target=\"_blank\" rel=\"noreferrer\" onclick=\"event.stopPropagation()\">Open original source &#8594;</a></p>
+        </td>
+      </tr>
       {% else %}
-      <tr><td colspan="7">No articles found yet.</td></tr>
+      <tr><td colspan="8">No articles found yet.</td></tr>
       {% endfor %}
       </tbody>
     </table>
   </div>
 
 </body>
+<script>
+  function toggleDetails(index) {
+    var detailsRow = document.getElementById('details-' + index);
+    var row = detailsRow.previousElementSibling;
+    var isOpen = detailsRow.classList.toggle('open');
+    row.classList.toggle('open', isOpen);
+  }
+</script>
 </html>
 """
 
@@ -114,7 +147,7 @@ def create_app(database_path: Optional[str] = None) -> Flask:
         try:
             articles = session.execute(
                 text(
-                    "SELECT title, link, source, source_type, score, priority, date, status FROM articles ORDER BY id DESC LIMIT 50"
+                    "SELECT title, link, source, source_type, score, priority, date, status, summary FROM articles ORDER BY id DESC LIMIT 50"
                 )
             ).fetchall()
             article_rows = [
@@ -127,6 +160,7 @@ def create_app(database_path: Optional[str] = None) -> Flask:
                     "priority": row[5],
                     "collected_at": row[6],
                     "status": row[7],
+                    "summary": row[8],
                 }
                 for row in articles
             ]
