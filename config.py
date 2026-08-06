@@ -22,6 +22,22 @@ KEYWORDS = [
     "body found",
     "investigation",
     "suspicious death",
+    "murder",
+    "killers",
+    "fatal",
+    "deceased",
+    "cold case",
+    "disappearance",
+    "person of interest",
+    "suspect",
+    "police",
+    "authorities",
+    "remains",
+    "victim",
+    "abduction",
+    "kidnapping",
+    "unconfirmed",
+    "unknown identity",
 ]
 
 REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
@@ -50,3 +66,4 @@ REDDIT_MAX_POSTS_PER_RUN = int(
 REDDIT_DELAY_SECONDS = int(
     os.getenv("REDDIT_DELAY_SECONDS", "20")
 )
+
