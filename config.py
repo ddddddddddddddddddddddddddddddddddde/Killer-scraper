@@ -7,11 +7,28 @@ APP_NAME = "Sentinel OSINT Monitor"
 
 DATABASE = "data/sentinel.db"
 
+# How often main.py's scheduler re-runs the full scan.
+SCAN_INTERVAL_SECONDS = int(os.getenv("SCAN_INTERVAL_SECONDS", "60"))
+
 RSS_FEEDS = [
     "https://news.google.com/rss/search?q=homicide",
     "https://news.google.com/rss/search?q=missing+person",
     "https://news.google.com/rss/search?q=unidentified+remains",
     "https://news.google.com/rss/search?q=suspicious+death",
+    "https://news.google.com/rss/search?q=police+scanner",
+    "https://news.google.com/rss/search?q=police+report",
+    "https://news.google.com/rss/search?q=police+blotter",
+    "https://news.google.com/rss/search?q=police+dispatch",
+    "https://news.google.com/rss/search?q=911+call",
+    "https://news.google.com/rss/search?q=active+police+scene",
+    "https://news.google.com/rss/search?q=officer+involved",
+    "https://news.google.com/rss/search?q=breaking+police+news",
+]
+
+# Police-scanner-style feeds that publish live dispatch/incident chatter.
+POLICE_SCANNER_FEEDS = [
+    "https://www.broadcastify.com/calls/rss",
+    "https://www.broadcastify.com/rss/feeds.rss",
 ]
 
 KEYWORDS = [
@@ -38,6 +55,16 @@ KEYWORDS = [
     "kidnapping",
     "unconfirmed",
     "unknown identity",
+    "police scanner",
+    "scanner traffic",
+    "police report",
+    "police blotter",
+    "dispatch",
+    "911 call",
+    "active scene",
+    "officer involved",
+    "all units",
+    "bolo",
 ]
 
 REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")

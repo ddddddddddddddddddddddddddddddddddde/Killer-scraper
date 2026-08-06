@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from config import KEYWORDS
+from config import KEYWORDS, SCAN_INTERVAL_SECONDS
 from database.database import engine, initialize_schema
 from database.models import Base
 from database.storage import save_articles
@@ -50,13 +50,20 @@ def calculate_score(article: dict) -> int:
     urgency_hits = sum(1 for term in urgency_terms if term.lower() in text)
 
     source_strength = 1 if article.get("source_type") in {"community", "rss"} else 0
+    if article.get("source_type") == "police_scanner":
+        source_strength = 2
 
     return keyword_hits + urgency_hits + source_strength
 
 
 def calculate_priority(article: dict) -> int:
     base_score = calculate_score(article)
-    source_strength = 2 if article.get("source_type") == "community" else 1
+    if article.get("source_type") == "police_scanner":
+        source_strength = 3
+    elif article.get("source_type") == "community":
+        source_strength = 2
+    else:
+        source_strength = 1
     title_boost = 1 if article.get("title", "").isupper() else 0
     return base_score + source_strength + title_boost
 
@@ -93,5 +100,20 @@ def run_scan() -> None:
     print("Sentinel scan complete.")
 
 
-if __name__ == "__main__":
+def run_forever() -> None:
+    from apscheduler.schedulers.blocking import BlockingScheduler
+
+    scheduler = BlockingScheduler()
+    scheduler.add_job(run_scan, "interval", seconds=SCAN_INTERVAL_SECONDS)
+    logger.info("Sentinel scheduler starting: scanning every %s seconds.", SCAN_INTERVAL_SECONDS)
+
     run_scan()
+
+    try:
+        scheduler.start()
+    except (KeyboardInterrupt, SystemExit):
+        logger.info("Sentinel scheduler stopped.")
+
+
+if __name__ == "__main__":
+    run_forever()

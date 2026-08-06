@@ -8,7 +8,7 @@ import feedparser
 import requests
 from bs4 import BeautifulSoup
 
-from config import RSS_FEEDS
+from config import POLICE_SCANNER_FEEDS, RSS_FEEDS
 
 
 class MultiSourceScraper:
@@ -26,11 +26,14 @@ class MultiSourceScraper:
         collected.extend(self._collect_social_and_forum_sources())
 
         for url in RSS_FEEDS:
-            collected.extend(self._collect_rss_feed(url))
+            collected.extend(self._collect_rss_feed(url, source_type="rss"))
+
+        for url in POLICE_SCANNER_FEEDS:
+            collected.extend(self._collect_rss_feed(url, source_type="police_scanner"))
 
         return collected
 
-    def _collect_rss_feed(self, url: str) -> list[dict[str, Any]]:
+    def _collect_rss_feed(self, url: str, source_type: str = "rss") -> list[dict[str, Any]]:
         try:
             feed = feedparser.parse(url)
         except Exception:
@@ -46,7 +49,7 @@ class MultiSourceScraper:
                     "source": source,
                     "date": item.get("published", ""),
                     "summary": item.get("summary", ""),
-                    "source_type": "rss",
+                    "source_type": source_type,
                 }
             )
         return articles
