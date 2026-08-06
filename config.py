@@ -25,11 +25,60 @@ RSS_FEEDS = [
     "https://news.google.com/rss/search?q=breaking+police+news",
 ]
 
-# Police-scanner-style feeds that publish live dispatch/incident chatter.
-POLICE_SCANNER_FEEDS = [
-    "https://www.broadcastify.com/calls/rss",
-    "https://www.broadcastify.com/rss/feeds.rss",
+# Free, script-friendly Socrata open-data 911/CAD feeds (no key/login, not
+# bot-walled like OpenMHz/Broadcastify). Mix of a major city and smaller
+# counties/towns, each refreshing continuously through the day.
+OPEN_DATA_SCANNER_FEEDS = [
+    {
+        "label": "Seattle Fire 911 Dispatch",
+        "domain": "data.seattle.gov",
+        "resource_id": "kzjm-xkqj",
+        "time_field": "datetime",
+        "title_field": "type",
+        "location_field": "address",
+        "id_field": "incident_number",
+    },
+    {
+        "label": "Seattle Police Calls for Service",
+        "domain": "data.seattle.gov",
+        "resource_id": "33kz-ixgy",
+        "time_field": "cad_event_original_time_queued",
+        "title_field": "initial_call_type",
+        "location_field": "dispatch_address",
+        "id_field": "cad_event_number",
+    },
+    {
+        "label": "Montgomery County MD Police Dispatch",
+        "domain": "data.montgomerycountymd.gov",
+        "resource_id": "98cc-bc7d",
+        "time_field": "start_time",
+        "title_field": "initial_type",
+        "location_field": "address",
+        "id_field": "incident_id",
+        "extra_field": "disposition_desc",
+    },
+    {
+        "label": "Everett WA Police Incidents",
+        "domain": "data.everettwa.gov",
+        "resource_id": "f6vp-3svh",
+        "time_field": "datetimereceived",
+        "title_field": "incidenttype",
+        "location_field": "eventaddressby100block",
+        "id_field": "eventnumber",
+    },
+    {
+        "label": "Winnebago County IL Dispatch Log",
+        "domain": "illinois-edp.data.socrata.com",
+        "resource_id": "i96m-iu3n",
+        "time_field": "dispatch_date_time",
+        "title_field": "incident_type_desc_display",
+        "location_field": "full_address",
+        "id_field": "event_number",
+    },
 ]
+
+# Records fetched per open-data feed per scan; duplicates are skipped by link.
+OPEN_DATA_FEED_LIMIT = int(os.getenv("OPEN_DATA_FEED_LIMIT", "25"))
 
 KEYWORDS = [
     "missing",

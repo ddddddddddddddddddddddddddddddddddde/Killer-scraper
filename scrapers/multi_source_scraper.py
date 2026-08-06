@@ -8,7 +8,8 @@ import feedparser
 import requests
 from bs4 import BeautifulSoup
 
-from config import POLICE_SCANNER_FEEDS, RSS_FEEDS
+from config import RSS_FEEDS
+from scrapers.open_data_scanner import OpenDataScanner
 
 
 class MultiSourceScraper:
@@ -19,6 +20,7 @@ class MultiSourceScraper:
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0 Safari/537.36",
             }
         )
+        self.scanner_scraper = OpenDataScanner(session=self.session)
 
     def collect_articles(self) -> list[dict[str, Any]]:
         collected: list[dict[str, Any]] = []
@@ -28,8 +30,7 @@ class MultiSourceScraper:
         for url in RSS_FEEDS:
             collected.extend(self._collect_rss_feed(url, source_type="rss"))
 
-        for url in POLICE_SCANNER_FEEDS:
-            collected.extend(self._collect_rss_feed(url, source_type="police_scanner"))
+        collected.extend(self.scanner_scraper.collect_articles())
 
         return collected
 
